@@ -217,7 +217,7 @@ export const openApiSpec = {
         properties: {
           category: {
             type: "string",
-            enum: ["Security", "Harassment", "Corruption", "Technical", "Other"],
+            description: "Category of the incident (e.g. Security, Harassment, Corruption, Technical, Financial Fraud, Other)",
             example: "Security"
           },
           description: {

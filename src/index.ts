@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import crypto from 'node:crypto';
-import { ALLOWED_CATEGORIES, ALLOWED_STATUSES, VALID_TRANSITIONS, Report } from './types.js';
+import { ALLOWED_STATUSES, VALID_TRANSITIONS, Report } from './types.js';
 import { reportsStore, addReport } from './db.js';
 import { openApiSpec } from './openapi.js';
 import { getDocsHtml } from './ui.js';
@@ -61,8 +61,8 @@ app.get('/openapi.json', (_req: Request, res: Response) => {
 app.post('/reports', (req: Request, res: Response) => {
   const { category, description, evidence_url } = req.body || {};
 
-  if (!category || typeof category !== 'string' || !ALLOWED_CATEGORIES.includes(category as any)) {
-    return res.status(400).json({ detail: 'Invalid category' });
+  if (!category || typeof category !== 'string' || category.trim().length === 0) {
+    return res.status(400).json({ detail: 'Category is required and cannot be empty' });
   }
 
   if (!description || typeof description !== 'string' || description.trim().length === 0) {
@@ -72,7 +72,7 @@ app.post('/reports', (req: Request, res: Response) => {
   const case_code = generateCaseCode();
   const dbReport = addReport({
     case_code,
-    category: category as Report['category'],
+    category: category.trim(),
     description: description.trim(),
     evidence_url: evidence_url ? String(evidence_url).trim() : null
   });

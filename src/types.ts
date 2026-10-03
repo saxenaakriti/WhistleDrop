@@ -1,7 +1,7 @@
 export interface Report {
   id: number;
   case_code: string;
-  category: 'Security' | 'Harassment' | 'Corruption' | 'Technical' | 'Other';
+  category: string;
   description: string;
   evidence_url: string | null;
   status: 'SUBMITTED' | 'UNDER_REVIEW' | 'RESOLVED' | 'DISMISSED';
@@ -16,13 +16,15 @@ export const ALLOWED_STATUSES = [
   'DISMISSED'
 ] as const;
 
-export const ALLOWED_CATEGORIES = [
+export const DEFAULT_CATEGORIES = [
   'Security',
   'Harassment',
   'Corruption',
   'Technical',
+  'Financial Fraud',
+  'Safety Violation',
   'Other'
-] as const;
+];
 
 export const VALID_TRANSITIONS: Record<string, string[]> = {
   SUBMITTED: ['UNDER_REVIEW'],
