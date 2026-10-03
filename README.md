@@ -1,4 +1,4 @@
-# WhistleDrop — Speak Without Being Seen 🛡️
+# WhistleDrop — Speak Without Being Seen 
 
 A confidential, anonymous incident reporting backend system allowing individuals to submit reports, track case status securely using difficult-to-guess case codes, and enabling moderators to manage review workflows with **Python & SQLite**.
 
