@@ -12,9 +12,24 @@ Moderators can securely view reports, filter them, and update their status.
 [https://github.com/saxenaakriti/WhistleDrop](https://github.com/saxenaakriti/WhistleDrop)
 
 **Live API:**
-https://whistle-drop-pink.vercel.app
+[https://whistle-drop-jwy7-2598up6yd-akriti14.vercel.app](https://whistle-drop-jwy7-2598up6yd-akriti14.vercel.app)
+
 **Swagger API Documentation:**
-https://whistle-drop-pink.vercel.app/docs#/default/create_report_reports_post
+[https://whistle-drop-jwy7-2598up6yd-akriti14.vercel.app/docs](https://whistle-drop-jwy7-2598up6yd-akriti14.vercel.app/docs)
+
+---
+
+## Application Screenshots & Verification
+
+| Screen | Description | Preview |
+|---|---|---|
+| **API Endpoints Overview** | Swagger UI listing all WhistleDrop endpoints (`GET /`, `POST /reports`, `GET /reports`, `GET /reports/{case_code}`, `PUT /reports/{case_code}/status`) | `screenshots/Screenshot (247).png` |
+| **Submit Report (201 Created)** | Submitting a report with `category`, `description`, returning unique case code | `screenshots/Screenshot (248).png` |
+| **List Reports (200 OK)** | Fetching list of all submitted reports via moderator access | `screenshots/Screenshot (249).png` |
+| **Moderator Filter** | Filtering reports by category (`Security`) and status (`SUBMITTED`) using `X-Moderator-Key` | `screenshots/Screenshot (250).png` |
+| **Track Report by Case Code** | Public case status tracking by unique case code | `screenshots/Screenshot (251).png` |
+| **Update Report Status Form** | Moderator status transition form (`SUBMITTED` -> `UNDER_REVIEW`) | `screenshots/Screenshot (252).png` |
+| **Status Updated Successfully** | Successful status transition response with moderator notes | `screenshots/Screenshot (253).png` |
 
 ---
 
