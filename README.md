@@ -12,10 +12,9 @@ Moderators can securely view reports, filter them, and update their status.
 [https://github.com/saxenaakriti/WhistleDrop](https://github.com/saxenaakriti/WhistleDrop)
 
 **Live API:**
-[https://whistle-drop-jwy7-2598up6yd-akriti14.vercel.app](https://whistle-drop-jwy7-2598up6yd-akriti14.vercel.app)
-
+https://whistle-drop-pink.vercel.app
 **Swagger API Documentation:**
-[https://whistle-drop-jwy7-2598up6yd-akriti14.vercel.app/docs](https://whistle-drop-jwy7-2598up6yd-akriti14.vercel.app/docs)
+https://whistle-drop-pink.vercel.app/docs#/default/create_report_reports_post
 
 ---
 
