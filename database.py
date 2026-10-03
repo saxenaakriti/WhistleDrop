@@ -1,12 +1,25 @@
 import sqlite3
 import os
+import shutil
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 
-DB_PATH = os.environ.get("WHISTLEDROP_DB", "whistledrop.db")
+def get_db_path() -> str:
+    custom = os.environ.get("WHISTLEDROP_DB")
+    if custom:
+        return custom
+    if os.environ.get("VERCEL"):
+        tmp_db = "/tmp/whistledrop.db"
+        if not os.path.exists(tmp_db) and os.path.exists("whistledrop.db"):
+            try:
+                shutil.copyfile("whistledrop.db", tmp_db)
+            except Exception:
+                pass
+        return tmp_db
+    return "whistledrop.db"
 
 def get_connection() -> sqlite3.Connection:
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(get_db_path())
     conn.row_factory = sqlite3.Row
     return conn
 
