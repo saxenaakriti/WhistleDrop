@@ -1,67 +1,157 @@
-# WhistleDrop — Speak Without Being Seen 
+# WhistleDrop — Speak Without Being Seen 🛡️
 
-A confidential, anonymous incident reporting backend system allowing individuals to submit reports, track case status securely using difficult-to-guess case codes, and enabling moderators to manage review workflows with **Python & SQLite**.
+[![Python 3.8+](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![SQLite 3](https://img.shields.io/badge/SQLite-3-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Tests Passing](https://img.shields.io/badge/Tests-Passing-success?style=for-the-badge&logo=pytest&logoColor=white)](test_api.py)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
----
-
-## Application Screenshots & Verification
-
-| Screen | Description | Preview |
-|---|---|---|
-| **API Endpoints Overview** | Swagger UI listing all WhistleDrop endpoints (`GET /`, `POST /reports`, `GET /reports`, `GET /reports/{case_code}`, `PUT /reports/{case_code}/status`) | `screenshots/Screenshot (247).png` |
-| **Submit Report (201 Created)** | Submitting a report with `category`, `description`, returning unique case code | `screenshots/Screenshot (248).png` |
-| **List Reports (200 OK)** | Fetching list of all submitted reports via moderator access | `screenshots/Screenshot (249).png` |
-| **Moderator Filter** | Filtering reports by category (`Security`) and status (`SUBMITTED`) using `X-Moderator-Key` | `screenshots/Screenshot (250).png` |
-| **Track Report by Case Code** | Public case status tracking by unique case code | `screenshots/Screenshot (251).png` |
-| **Update Report Status Form** | Moderator status transition form (`SUBMITTED` -> `UNDER_REVIEW`) | `screenshots/Screenshot (252).png` |
-| **Status Updated Successfully** | Successful status transition response with moderator notes | `screenshots/Screenshot (253).png` |
+> **WhistleDrop** is a confidential, anonymous incident reporting backend system built with **Python 3 & SQLite**. It allows individuals to securely submit reports without accounts or identities, track their investigation via cryptographic case codes, and enables authorized moderators to manage investigation workflows through a validated state machine.
 
 ---
 
-## Tech Stack
+## 📸 Application Screenshots & Verification
 
+The backend includes interactive **Swagger UI / OpenAPI documentation** at `/docs`. Below is the visual proof of functionality across all core endpoints:
+
+<details open>
+<summary><b>1. Swagger UI & API Endpoints Overview</b></summary>
+<br>
+Interactive documentation displaying all endpoints: <code>GET /</code>, <code>POST /reports</code>, <code>GET /reports</code>, <code>GET /reports/{case_code}</code>, and <code>PUT /reports/{case_code}/status</code>.<br><br>
+<img src="screenshots/Screenshot%20(247).png" alt="WhistleDrop Swagger UI Overview" width="100%" />
+</details>
+
+<br>
+
+<details>
+<summary><b>2. Anonymous Report Submission (POST /reports — 201 Created)</b></summary>
+<br>
+Submitting an incident with category, description, and optional evidence URL. The server creates the report in SQLite and returns a unique case code (e.g. <code>WD-ZEYIW5GKQD3P</code>).<br><br>
+<img src="screenshots/Screenshot%20(248).png" alt="POST /reports 201 Created" width="100%" />
+</details>
+
+<br>
+
+<details>
+<summary><b>3. Moderator Reports Listing (GET /reports — 200 OK)</b></summary>
+<br>
+Moderator retrieves submitted reports filtered by criteria, complete with case codes, timestamps, and investigation status.<br><br>
+<img src="screenshots/Screenshot%20(249).png" alt="GET /reports 200 OK" width="100%" />
+</details>
+
+<br>
+
+<details>
+<summary><b>4. Moderator Filtering & Authentication Header</b></summary>
+<br>
+Demonstration of query parameter filtering (<code>category=Security</code>, <code>status=SUBMITTED</code>) and secret header authentication (<code>X-Moderator-Key: WD-MOD-2026</code>).<br><br>
+<img src="screenshots/Screenshot%20(250).png" alt="Moderator Query Filters" width="100%" />
+</details>
+
+<br>
+
+<details>
+<summary><b>5. Public Case Code Tracking (GET /reports/{case_code})</b></summary>
+<br>
+Reporters can query report status anytime using their case code (e.g. <code>WD-A7K92M4QX81P</code>) without logging in.<br><br>
+<img src="screenshots/Screenshot%20(251).png" alt="Case Tracking by Code" width="100%" />
+</details>
+
+<br>
+
+<details>
+<summary><b>6. Status Transition Parameters (PUT /reports/{case_code}/status)</b></summary>
+<br>
+Moderator initiates workflow transition from <code>SUBMITTED</code> to <code>UNDER_REVIEW</code> with internal notes.<br><br>
+<img src="screenshots/Screenshot%20(252).png" alt="Status Update Request" width="100%" />
+</details>
+
+<br>
+
+<details>
+<summary><b>7. Status Updated Successfully (200 OK)</b></summary>
+<br>
+Verification of successful state update persisted into SQLite database.<br><br>
+<img src="screenshots/Screenshot%20(253).png" alt="Status Update Success" width="100%" />
+</details>
+
+---
+
+## 🛠️ Architecture & Tech Stack
+
+```
+                   ┌──────────────────────────────┐
+                   │        HTTP / REST API       │
+                   └──────────────┬───────────────┘
+                                  │
+         ┌────────────────────────┴────────────────────────┐
+         │                                                 │
+         ▼                                                 ▼
+┌──────────────────┐                              ┌──────────────────┐
+│   FastAPI App    │                              │  Standalone App  │
+│    (main.py)     │                              │ (standalone.py)  │
+└────────┬─────────┘                              └────────┬─────────┘
+         │                                                 │
+         ▼                                                 ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                    SQLite 3 (whistledrop.db)                       │
+│  Indexed by: case_code (UNIQUE) | status | category                │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+* **Backend Framework:** FastAPI (High performance, auto-generated OpenAPI schemas)
 * **Language:** Python 3.8+
-* **Framework:** FastAPI
-* **Database:** SQLite 3 (`whistledrop.db`)
-* **Validation:** Pydantic
-* **Documentation:** Swagger UI / OpenAPI 3.0 (`/docs`) & ReDoc (`/redoc`)
-* **Testing:** Python `unittest`
+* **Database:** SQLite 3 with indexing and connection pooling
+* **Validation:** Pydantic (Type enforcement & schema serialization)
+* **Zero-Dependency Runner:** `standalone.py` (Runs with Python standard library alone)
+* **Testing:** Built-in Python `unittest` (`test_api.py`)
 
 ---
 
-## Key Features
+## ✨ Key Features
 
-* **Anonymous Submission**: No user account, email, or identity required.
-* **Cryptographic Case Codes**: High-entropy unique identifiers (e.g. `WD-A7K92M4QX81P`) generated using `secrets`.
-* **Category & Description Enforcement**: Strict validation for incident category and description.
-* **SQLite Relational Persistence**: Auto-initialized table with optimized indexes on `case_code`, `status`, and `category`.
-* **Public Tracking**: Anyone with a valid case code can query status updates without authentication.
-* **Protected Moderator Access**: Role authorization enforced via secret `X-Moderator-Key: WD-MOD-2026`.
-* **Workflow State Machine**: Enforces valid status transitions:
-  `SUBMITTED` ➔ `UNDER_REVIEW` ➔ `RESOLVED` or `DISMISSED`
-* **Zero-Dependency Mode**: Includes `standalone.py` to run directly on standard Python library.
+1. **100% Anonymous Reporting**: No sign-up, email, IP logging, or account creation required.
+2. **Cryptographic Case Codes**: High-entropy identifiers (`WD-` prefix + 12 alphanumeric characters) generated via Python's CSPRNG `secrets` module.
+3. **Relational SQLite Persistence**: Automatic schema migrations, transactions, and index optimizations on `case_code`, `status`, and `category`.
+4. **Moderator Authentication**: Protected administrative operations guarded by secret header token (`X-Moderator-Key: WD-MOD-2026`).
+5. **Enforced Status Workflow**: State machine prevents invalid transitions:
+   ```
+   [ SUBMITTED ] ──> [ UNDER_REVIEW ] ──┬──> [ RESOLVED ]
+                                        └──> [ DISMISSED ]
+   ```
+6. **Zero-Dependency Mode**: Run on any computer with Python 3 without running `pip install`.
 
 ---
 
-## Project Structure
+## 📂 Repository File Tree
 
 ```
-├── database.py       # SQLite connection, schema creation, indexed queries
-├── main.py           # FastAPI application & API route handlers
-├── schemas.py        # Pydantic request/response validation models
-├── standalone.py     # Standalone Python runner (zero pip dependencies)
-├── test_api.py       # Automated unit test suite
+WhistleDrop/
+├── database.py       # SQLite connection, schema setup & indexed queries
+├── main.py           # FastAPI application & API endpoints
+├── schemas.py        # Pydantic request/response validation schemas
+├── standalone.py     # Standalone Python runner (zero external dependencies)
+├── test_api.py       # Automated SQLite unit test suite
 ├── requirements.txt  # Python package dependencies
-├── whistledrop.db    # SQLite database file (pre-seeded)
-├── screenshots/      # Application screenshots (247-253)
-└── README.md         # Documentation
+├── whistledrop.db    # Seeded SQLite database
+├── LICENSE           # MIT Open Source License
+├── .gitignore        # Python gitignore
+├── README.md         # Comprehensive documentation & API guide
+└── screenshots/      # Application screenshots (247-253)
+    ├── Screenshot (247).png
+    ├── Screenshot (248).png
+    ├── Screenshot (249).png
+    ├── Screenshot (250).png
+    ├── Screenshot (251).png
+    ├── Screenshot (252).png
+    └── Screenshot (253).png
 ```
 
 ---
 
-## Quick Start
+## 🚀 Quick Start Guide
 
-### Option 1: FastAPI + SQLite (Recommended)
+### Option 1: FastAPI with Uvicorn (Recommended)
 
 1. **Clone the repository:**
    ```bash
@@ -69,45 +159,45 @@ A confidential, anonymous incident reporting backend system allowing individuals
    cd WhistleDrop
    ```
 
-2. **Create virtual environment & install dependencies:**
+2. **Create virtual environment & install requirements:**
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install -r requirements.txt
    ```
 
-3. **Start the API server:**
+3. **Run the development server:**
    ```bash
    uvicorn main:app --reload --port 8000
    ```
 
-4. **Access the Interactive Docs:**
-   * Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
-   * ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+4. **Open Interactive Docs:**
+   * **Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
+   * **ReDoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 ---
 
-### Option 2: Standalone Mode (Zero Dependencies)
+### Option 2: Zero-Dependency Standalone Mode
 
-If you don't have `pip` installed, run directly with standard Python 3:
+Run directly using Python's standard library (no `pip install` required):
 
 ```bash
 python3 standalone.py
 ```
-* Server starts on [http://localhost:8000](http://localhost:8000).
+Server starts immediately on [http://localhost:8000](http://localhost:8000).
 
 ---
 
-## Running Unit Tests
+## 🧪 Running Automated Tests
 
-Run the built-in SQLite test suite:
+Run the built-in SQLite test suite to verify database integrity, constraints, queries, and transitions:
 
 ```bash
 python3 test_api.py
 ```
 
 Expected output:
-```
+```text
 ....
 ----------------------------------------------------------------------
 Ran 4 tests in 0.005s
@@ -117,7 +207,7 @@ OK
 
 ---
 
-## Database Schema (`whistledrop.db`)
+## 🗄️ Database Schema (`whistledrop.db`)
 
 ```sql
 CREATE TABLE IF NOT EXISTS reports (
@@ -136,115 +226,57 @@ CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
 CREATE INDEX IF NOT EXISTS idx_reports_category ON reports(category);
 ```
 
----
-
-## API Reference
-
-### 1. Root / Welcome
-* **Endpoint:** `GET /`
-* **Response:**
-  ```json
-  {
-    "message": "Welcome to WhistleDrop - Speak Without Being Seen"
-  }
-  ```
+### Supported Categories:
+* `Security`
+* `Harassment`
+* `Corruption`
+* `Technical`
+* `Other`
 
 ---
+
+## 📡 API Reference & cURL Examples
+
+### 1. Welcome / Home
+```bash
+curl -X GET "http://localhost:8000/"
+```
 
 ### 2. Submit Anonymous Report
-* **Endpoint:** `POST /reports`
-* **Request Body:**
-  ```json
-  {
+```bash
+curl -X POST "http://localhost:8000/reports" \
+  -H "Content-Type: application/json" \
+  -d '{
     "category": "Security",
-    "description": "Unauthorized access attempt observed in staging environment.",
-    "evidence_url": "https://example.com/log.txt"
-  }
-  ```
-* **Response (201 Created):**
-  ```json
-  {
-    "message": "Report received successfully",
-    "case_code": "WD-ZEYIW5GKQD3P",
-    "category": "Security",
-    "description": "Unauthorized access attempt observed in staging environment.",
-    "evidence_url": "https://example.com/log.txt"
-  }
-  ```
-
----
+    "description": "Unauthorized access attempt observed in server room.",
+    "evidence_url": "https://example.com/logs.txt"
+  }'
+```
 
 ### 3. Track Report Status (Public)
-* **Endpoint:** `GET /reports/{case_code}`
-* **Response (200 OK):**
-  ```json
-  {
-    "id": 1,
-    "case_code": "WD-A7K92M4QX81P",
-    "category": "Security",
-    "description": "There is a security issue that needs to be reviewed.",
-    "evidence_url": "https://example.com/evidence",
-    "status": "SUBMITTED",
-    "status_update": null,
-    "created_at": "2026-10-01T10:15:00.000Z"
-  }
-  ```
-
----
+```bash
+curl -X GET "http://localhost:8000/reports/WD-A7K92M4QX81P"
+```
 
 ### 4. Moderator: List & Filter Reports
-* **Endpoint:** `GET /reports?category=Security&status=SUBMITTED`
-* **Headers:** `X-Moderator-Key: WD-MOD-2026`
-* **Response (200 OK):**
-  ```json
-  [
-    {
-      "id": 1,
-      "case_code": "WD-A7K92M4QX81P",
-      "category": "Security",
-      "description": "There is a security issue that needs to be reviewed.",
-      "evidence_url": "https://example.com/evidence",
-      "status": "SUBMITTED",
-      "status_update": null,
-      "created_at": "2026-10-01T10:15:00.000Z"
-    }
-  ]
-  ```
+```bash
+curl -X GET "http://localhost:8000/reports?category=Security&status=SUBMITTED" \
+  -H "X-Moderator-Key: WD-MOD-2026"
+```
+
+### 5. Moderator: Update Case Status
+```bash
+curl -X PUT "http://localhost:8000/reports/WD-A7K92M4QX81P/status" \
+  -H "X-Moderator-Key: WD-MOD-2026" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "UNDER_REVIEW",
+    "status_update": "Internal investigation team assigned to verify incident."
+  }'
+```
 
 ---
 
-### 5. Moderator: Update Report Status
-* **Endpoint:** `PUT /reports/{case_code}/status`
-* **Headers:** `X-Moderator-Key: WD-MOD-2026`
-* **Request Body:**
-  ```json
-  {
-    "status": "UNDER_REVIEW",
-    "status_update": "Ethics committee inquiry opened."
-  }
-  ```
-* **Response (200 OK):**
-  ```json
-  {
-    "message": "Report status updated successfully",
-    "case_code": "WD-A7K92M4QX81P",
-    "status": "UNDER_REVIEW",
-    "status_update": "Ethics committee inquiry opened."
-  }
-  ```
+## 📄 License
 
----
-
-## Status Transition Rules
-
-```
-[ SUBMITTED ]
-      │
-      ▼
-[ UNDER_REVIEW ]
-   │         │
-   ▼         ▼
-[RESOLVED] [DISMISSED]
-```
-
-Any attempt to jump illegally (e.g. `SUBMITTED` ➔ `RESOLVED` directly) returns HTTP `400 Bad Request`.
+This project is licensed under the [MIT License](LICENSE).
