@@ -1,157 +1,26 @@
 # WhistleDrop — Speak Without Being Seen 🛡️
 
-[![Python 3.8+](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![SQLite 3](https://img.shields.io/badge/SQLite-3-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
-[![Tests Passing](https://img.shields.io/badge/Tests-Passing-success?style=for-the-badge&logo=pytest&logoColor=white)](test_api.py)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+**Live Deployment & Interactive API Docs:**  
+👉 [https://whistle-drop-jwy7.vercel.app/docs#/default/create_report_reports_post](https://whistle-drop-jwy7.vercel.app/docs#/default/create_report_reports_post)
 
-> **WhistleDrop** is a confidential, anonymous incident reporting backend system built with **Python 3 & SQLite**. It allows individuals to securely submit reports without accounts or identities, track their investigation via cryptographic case codes, and enables authorized moderators to manage investigation workflows through a validated state machine.
+WhistleDrop is a confidential, anonymous incident reporting system built with **Python & SQLite**. It allows individuals to submit reports safely without creating accounts or revealing their identity, track investigation progress using cryptographic case codes, and enables moderators to review and update case statuses through a validated workflow.
 
 ---
 
-## 📸 Application Screenshots & Verification
+## 1. Setup Instructions
 
-The backend includes interactive **Swagger UI / OpenAPI documentation** at `/docs`. Below is the visual proof of functionality across all core endpoints:
+Follow these step-by-step instructions to run the project locally on your machine:
 
-<details open>
-<summary><b>1. Swagger UI & API Endpoints Overview</b></summary>
-<br>
-Interactive documentation displaying all endpoints: <code>GET /</code>, <code>POST /reports</code>, <code>GET /reports</code>, <code>GET /reports/{case_code}</code>, and <code>PUT /reports/{case_code}/status</code>.<br><br>
-<img src="screenshots/Screenshot%20(247).png" alt="WhistleDrop Swagger UI Overview" width="100%" />
-</details>
-
-<br>
-
-<details>
-<summary><b>2. Anonymous Report Submission (POST /reports — 201 Created)</b></summary>
-<br>
-Submitting an incident with category, description, and optional evidence URL. The server creates the report in SQLite and returns a unique case code (e.g. <code>WD-ZEYIW5GKQD3P</code>).<br><br>
-<img src="screenshots/Screenshot%20(248).png" alt="POST /reports 201 Created" width="100%" />
-</details>
-
-<br>
-
-<details>
-<summary><b>3. Moderator Reports Listing (GET /reports — 200 OK)</b></summary>
-<br>
-Moderator retrieves submitted reports filtered by criteria, complete with case codes, timestamps, and investigation status.<br><br>
-<img src="screenshots/Screenshot%20(249).png" alt="GET /reports 200 OK" width="100%" />
-</details>
-
-<br>
-
-<details>
-<summary><b>4. Moderator Filtering & Authentication Header</b></summary>
-<br>
-Demonstration of query parameter filtering (<code>category=Security</code>, <code>status=SUBMITTED</code>) and secret header authentication (<code>X-Moderator-Key: WD-MOD-2026</code>).<br><br>
-<img src="screenshots/Screenshot%20(250).png" alt="Moderator Query Filters" width="100%" />
-</details>
-
-<br>
-
-<details>
-<summary><b>5. Public Case Code Tracking (GET /reports/{case_code})</b></summary>
-<br>
-Reporters can query report status anytime using their case code (e.g. <code>WD-A7K92M4QX81P</code>) without logging in.<br><br>
-<img src="screenshots/Screenshot%20(251).png" alt="Case Tracking by Code" width="100%" />
-</details>
-
-<br>
-
-<details>
-<summary><b>6. Status Transition Parameters (PUT /reports/{case_code}/status)</b></summary>
-<br>
-Moderator initiates workflow transition from <code>SUBMITTED</code> to <code>UNDER_REVIEW</code> with internal notes.<br><br>
-<img src="screenshots/Screenshot%20(252).png" alt="Status Update Request" width="100%" />
-</details>
-
-<br>
-
-<details>
-<summary><b>7. Status Updated Successfully (200 OK)</b></summary>
-<br>
-Verification of successful state update persisted into SQLite database.<br><br>
-<img src="screenshots/Screenshot%20(253).png" alt="Status Update Success" width="100%" />
-</details>
+### Prerequisites
+- **Python 3.8+** installed on your system. You can check by running:
+  ```bash
+  python3 --version
+  ```
+- **Git** installed on your system.
 
 ---
 
-## 🛠️ Architecture & Tech Stack
-
-```
-                   ┌──────────────────────────────┐
-                   │        HTTP / REST API       │
-                   └──────────────┬───────────────┘
-                                  │
-         ┌────────────────────────┴────────────────────────┐
-         │                                                 │
-         ▼                                                 ▼
-┌──────────────────┐                              ┌──────────────────┐
-│   FastAPI App    │                              │  Standalone App  │
-│    (main.py)     │                              │ (standalone.py)  │
-└────────┬─────────┘                              └────────┬─────────┘
-         │                                                 │
-         ▼                                                 ▼
-┌────────────────────────────────────────────────────────────────────┐
-│                    SQLite 3 (whistledrop.db)                       │
-│  Indexed by: case_code (UNIQUE) | status | category                │
-└────────────────────────────────────────────────────────────────────┘
-```
-
-* **Backend Framework:** FastAPI (High performance, auto-generated OpenAPI schemas)
-* **Language:** Python 3.8+
-* **Database:** SQLite 3 with indexing and connection pooling
-* **Validation:** Pydantic (Type enforcement & schema serialization)
-* **Zero-Dependency Runner:** `standalone.py` (Runs with Python standard library alone)
-* **Testing:** Built-in Python `unittest` (`test_api.py`)
-
----
-
-## ✨ Key Features
-
-1. **100% Anonymous Reporting**: No sign-up, email, IP logging, or account creation required.
-2. **Cryptographic Case Codes**: High-entropy identifiers (`WD-` prefix + 12 alphanumeric characters) generated via Python's CSPRNG `secrets` module.
-3. **Relational SQLite Persistence**: Automatic schema migrations, transactions, and index optimizations on `case_code`, `status`, and `category`.
-4. **Moderator Authentication**: Protected administrative operations guarded by secret header token (`X-Moderator-Key: WD-MOD-2026`).
-5. **Enforced Status Workflow**: State machine prevents invalid transitions:
-   ```
-   [ SUBMITTED ] ──> [ UNDER_REVIEW ] ──┬──> [ RESOLVED ]
-                                        └──> [ DISMISSED ]
-   ```
-6. **Zero-Dependency Mode**: Run on any computer with Python 3 without running `pip install`.
-
----
-
-## 📂 Repository File Tree
-
-```
-WhistleDrop/
-├── database.py       # SQLite connection, schema setup & indexed queries
-├── main.py           # FastAPI application & API endpoints
-├── schemas.py        # Pydantic request/response validation schemas
-├── standalone.py     # Standalone Python runner (zero external dependencies)
-├── test_api.py       # Automated SQLite unit test suite
-├── requirements.txt  # Python package dependencies
-├── whistledrop.db    # Seeded SQLite database
-├── LICENSE           # MIT Open Source License
-├── .gitignore        # Python gitignore
-├── README.md         # Comprehensive documentation & API guide
-└── screenshots/      # Application screenshots (247-253)
-    ├── Screenshot (247).png
-    ├── Screenshot (248).png
-    ├── Screenshot (249).png
-    ├── Screenshot (250).png
-    ├── Screenshot (251).png
-    ├── Screenshot (252).png
-    └── Screenshot (253).png
-```
-
----
-
-## 🚀 Quick Start Guide
-
-### Option 1: FastAPI with Uvicorn (Recommended)
+### Option A: Running with FastAPI & Uvicorn (Recommended)
 
 1. **Clone the repository:**
    ```bash
@@ -159,38 +28,48 @@ WhistleDrop/
    cd WhistleDrop
    ```
 
-2. **Create virtual environment & install requirements:**
+2. **Create and activate a virtual environment:**
+   - On macOS / Linux:
+     ```bash
+     python3 -m venv venv
+     source venv/bin/activate
+     ```
+   - On Windows:
+     ```bash
+     python -m venv venv
+     venv\Scripts\activate
+     ```
+
+3. **Install the required packages:**
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install -r requirements.txt
    ```
 
-3. **Run the development server:**
+4. **Start the server:**
    ```bash
    uvicorn main:app --reload --port 8000
    ```
 
-4. **Open Interactive Docs:**
-   * **Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
-   * **ReDoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
+5. **Explore the API:**
+   - Interactive Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
+   - Alternative ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 ---
 
-### Option 2: Zero-Dependency Standalone Mode
+### Option B: Zero-Dependency Standalone Mode
 
-Run directly using Python's standard library (no `pip install` required):
+If you do not want to install any external packages, WhistleDrop can run directly using Python's built-in standard library (`sqlite3`, `http.server`, `json`):
 
 ```bash
 python3 standalone.py
 ```
-Server starts immediately on [http://localhost:8000](http://localhost:8000).
+The server will start on [http://localhost:8000](http://localhost:8000).
 
 ---
 
-## 🧪 Running Automated Tests
+### Running Automated Unit Tests
 
-Run the built-in SQLite test suite to verify database integrity, constraints, queries, and transitions:
+To test the database operations, constraints, and queries:
 
 ```bash
 python3 test_api.py
@@ -207,76 +86,160 @@ OK
 
 ---
 
-## 🗄️ Database Schema (`whistledrop.db`)
+## 2. API Endpoints and Their Purpose
 
-```sql
-CREATE TABLE IF NOT EXISTS reports (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    case_code TEXT UNIQUE NOT NULL,
-    category TEXT NOT NULL,
-    description TEXT NOT NULL,
-    evidence_url TEXT,
-    status TEXT NOT NULL DEFAULT 'SUBMITTED',
-    status_update TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_reports_case_code ON reports(case_code);
-CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
-CREATE INDEX IF NOT EXISTS idx_reports_category ON reports(category);
-```
-
-### Supported Categories:
-* `Security`
-* `Harassment`
-* `Corruption`
-* `Technical`
-* `Other`
+| Method | Endpoint | Access | Purpose |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | Public | Welcome message and health confirmation. |
+| `POST` | `/reports` | Public | Submit a new anonymous incident report. Returns a generated 12-character cryptographic case code. |
+| `GET` | `/reports/{case_code}` | Public | Look up the current status and moderator notes of a report using its case code. |
+| `GET` | `/reports` | Moderator Only | View and filter all submitted incident reports. Requires `X-Moderator-Key` header. |
+| `PUT` | `/reports/{case_code}/status` | Moderator Only | Update the investigation status and add notes for a case following the state machine. Requires `X-Moderator-Key` header. |
 
 ---
 
-## 📡 API Reference & cURL Examples
+## 3. How Anonymity is Maintained
 
-### 1. Welcome / Home
-```bash
-curl -X GET "http://localhost:8000/"
-```
+WhistleDrop is built from the ground up to protect the reporter's privacy:
 
-### 2. Submit Anonymous Report
-```bash
-curl -X POST "http://localhost:8000/reports" \
-  -H "Content-Type: application/json" \
-  -d '{
+1. **No User Accounts or Sign-ups**:
+   - The application does not collect names, email addresses, phone numbers, or passwords.
+   - Anyone can submit a report immediately without creating an account or logging in.
+
+2. **No IP Logging or Digital Fingerprinting**:
+   - The database schema only records the incident data (`case_code`, `category`, `description`, `evidence_url`, `status`, `status_update`, and `created_at`).
+   - Client IP addresses, browser fingerprints, and network headers are intentionally never saved to the database.
+
+3. **High-Entropy Cryptographic Case Codes**:
+   - Case codes are generated using Python’s `secrets` module (a Cryptographically Secure Pseudo-Random Number Generator, CSPRNG).
+   - Format: `WD-` followed by 12 random alphanumeric characters (e.g. `WD-A7K92M4QX81P`).
+   - With 36 possible characters and 12 positions (36¹² ≈ 4.73 × 10¹⁸ combinations), it is virtually impossible for anyone to guess or brute-force another person's case code.
+
+4. **Isolated Access Control**:
+   - Reporters can only access their specific report by providing their exact case code.
+   - The list of all submissions is protected by a moderator key (`X-Moderator-Key`), preventing unauthorized users from browsing other reports.
+
+---
+
+## 4. Example Requests and Responses
+
+You can test these commands in your terminal using `curl` or by using the Swagger UI at [https://whistle-drop-jwy7.vercel.app/docs](https://whistle-drop-jwy7.vercel.app/docs).
+
+### 1. Submit an Anonymous Report
+* **Endpoint:** `POST /reports`
+* **cURL Request:**
+  ```bash
+  curl -X POST "https://whistle-drop-jwy7.vercel.app/reports" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "category": "Security",
+      "description": "Unauthorized individual seen accessing server room after business hours.",
+      "evidence_url": "https://example.com/evidence-photo.jpg"
+    }'
+  ```
+* **Response (`201 Created`):**
+  ```json
+  {
+    "message": "Report received successfully",
+    "case_code": "WD-A7K92M4QX81P",
     "category": "Security",
-    "description": "Unauthorized access attempt observed in server room.",
-    "evidence_url": "https://example.com/logs.txt"
-  }'
-```
-
-### 3. Track Report Status (Public)
-```bash
-curl -X GET "http://localhost:8000/reports/WD-A7K92M4QX81P"
-```
-
-### 4. Moderator: List & Filter Reports
-```bash
-curl -X GET "http://localhost:8000/reports?category=Security&status=SUBMITTED" \
-  -H "X-Moderator-Key: WD-MOD-2026"
-```
-
-### 5. Moderator: Update Case Status
-```bash
-curl -X PUT "http://localhost:8000/reports/WD-A7K92M4QX81P/status" \
-  -H "X-Moderator-Key: WD-MOD-2026" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "status": "UNDER_REVIEW",
-    "status_update": "Internal investigation team assigned to verify incident."
-  }'
-```
+    "description": "Unauthorized individual seen accessing server room after business hours.",
+    "evidence_url": "https://example.com/evidence-photo.jpg"
+  }
+  ```
 
 ---
 
-## 📄 License
+### 2. Track Report Status (Public)
+* **Endpoint:** `GET /reports/{case_code}`
+* **cURL Request:**
+  ```bash
+  curl -X GET "https://whistle-drop-jwy7.vercel.app/reports/WD-A7K92M4QX81P"
+  ```
+* **Response (`200 OK`):**
+  ```json
+  {
+    "id": 1,
+    "case_code": "WD-A7K92M4QX81P",
+    "category": "Security",
+    "description": "Unauthorized individual seen accessing server room after business hours.",
+    "evidence_url": "https://example.com/evidence-photo.jpg",
+    "status": "SUBMITTED",
+    "status_update": null,
+    "created_at": "2026-10-01T10:15:00.000Z"
+  }
+  ```
 
-This project is licensed under the [MIT License](LICENSE).
+---
+
+### 3. View All Reports (Moderator)
+* **Endpoint:** `GET /reports?category=Security&status=SUBMITTED`
+* **cURL Request:**
+  ```bash
+  curl -X GET "https://whistle-drop-jwy7.vercel.app/reports?category=Security&status=SUBMITTED" \
+    -H "X-Moderator-Key: WD-MOD-2026"
+  ```
+* **Response (`200 OK`):**
+  ```json
+  [
+    {
+      "id": 1,
+      "case_code": "WD-A7K92M4QX81P",
+      "category": "Security",
+      "description": "Unauthorized individual seen accessing server room after business hours.",
+      "evidence_url": "https://example.com/evidence-photo.jpg",
+      "status": "SUBMITTED",
+      "status_update": null,
+      "created_at": "2026-10-01T10:15:00.000Z"
+    }
+  ]
+  ```
+
+---
+
+### 4. Update Report Status (Moderator)
+* **Endpoint:** `PUT /reports/{case_code}/status`
+* **cURL Request:**
+  ```bash
+  curl -X PUT "https://whistle-drop-jwy7.vercel.app/reports/WD-A7K92M4QX81P/status" \
+    -H "X-Moderator-Key: WD-MOD-2026" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "status": "UNDER_REVIEW",
+      "status_update": "Ethics and Security team assigned to investigate entry badge logs."
+    }'
+  ```
+* **Response (`200 OK`):**
+  ```json
+  {
+    "message": "Report status updated successfully",
+    "case_code": "WD-A7K92M4QX81P",
+    "status": "UNDER_REVIEW",
+    "status_update": "Ethics and Security team assigned to investigate entry badge logs."
+  }
+  ```
+
+---
+
+## 5. Important Assumptions and Design Decisions
+
+1. **State Machine for Case Statuses**:
+   - Rather than allowing any status to change randomly, transitions must strictly follow this workflow:
+     ```text
+     [ SUBMITTED ] ──> [ UNDER_REVIEW ] ──┬──> [ RESOLVED ]
+                                          └──> [ DISMISSED ]
+     ```
+   - *Why:* A report cannot be marked `RESOLVED` directly from `SUBMITTED` without an active review phase. Once marked `RESOLVED` or `DISMISSED`, it reaches a terminal state to preserve investigation records.
+
+2. **Cryptographic Case Code in Place of Accounts**:
+   - *Why:* Asking a whistleblower to create an account requires personal identifiers (such as an email). A single random case code allows the user to check updates anytime while keeping their identity 100% disconnected from the submission.
+
+3. **SQLite Database Choice**:
+   - *Why:* SQLite is lightweight, serverless, and file-based. It requires zero configuration, making it fast to deploy and ideal for small to mid-sized applications.
+   - *Optimization:* Database indexes are added to `case_code` (unique index), `status`, and `category` so searching and filtering remain fast as data grows.
+
+4. **Shared Secret Key for Moderator Authentication**:
+   - *Why:* To keep the backend code simple, readable, and lightweight for a student project, moderator protection is implemented via an `X-Moderator-Key` header (`WD-MOD-2026`) instead of a complex multi-table user/password management system.
+
+5. **Self-Documenting REST API with FastAPI**:
+   - *Why:* FastAPI automatically generates interactive OpenAPI documentation (`/docs`), making it easy for reviewers, teammates, and evaluators to test API endpoints directly in the browser without third-party software like Postman.
