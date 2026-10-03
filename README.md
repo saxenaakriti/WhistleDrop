@@ -41,13 +41,10 @@ whistle-drop-pink.vercel.app/docs
 
 ## Technologies Used
 
-* Python
-* FastAPI
-* SQLAlchemy
-* SQLite
-* Pydantic
-* Uvicorn
-* Vercel
+* Node.js & TypeScript
+* Express.js
+* Swagger UI / OpenAPI 3.0
+* CORS
 
 ---
 
@@ -422,51 +419,45 @@ The SQLite database file is excluded from Git using `.gitignore`.
 
 # Running the Project Locally
 
-## 1. Open the project folder
+No environment variables or `.env` file are required. The server runs directly out of the box.
 
-Open the WhistleDrop folder in VS Code.
+## 1. Install dependencies
 
-## 2. Install dependencies
-
-If required, install the dependencies using:
-
-```powershell
-.\venv\Scripts\python.exe -m pip install -r requirements.txt
+```bash
+npm install
 ```
 
-## 3. Start the server
+## 2. Start the development server
 
-Run:
-
-```powershell
-.\venv\Scripts\python.exe -m uvicorn main:app --port 8001
+```bash
+npm run dev
 ```
 
 The API will be available at:
 
 ```text
-http://127.0.0.1:8001
+http://localhost:3000
+```
+
+Interactive Swagger documentation is available at:
+
+```text
+http://localhost:3000/docs
 ```
 
 ---
 
 # Swagger Documentation
 
-FastAPI automatically provides interactive API documentation.
+Interactive Swagger API documentation is provided directly at `/docs` using OpenAPI 3.0.0.
 
 After starting the server, open:
 
 ```text
-http://127.0.0.1:8001/docs
+http://localhost:3000/docs
 ```
 
-The Swagger page can be used to test all the API endpoints without needing a frontend.
-
-The deployed API also provides Swagger documentation at:
-
-```text
-PASTE_YOUR_VERCEL_URL_HERE/docs
-```
+The Swagger page can be used to test all the API endpoints directly without needing a separate client.
 
 ---
 
@@ -474,14 +465,16 @@ PASTE_YOUR_VERCEL_URL_HERE/docs
 
 ```text
 WhistleDrop/
-│
-├── main.py
-├── models.py
-├── database.py
-├── requirements.txt
-├── README.md
-├── .gitignore
-└── whistledrop.db
+├── src/
+│   ├── index.ts      # Express application and route handlers
+│   ├── types.ts      # Data types, categories, and workflow transitions
+│   ├── db.ts         # In-memory storage and seed data
+│   ├── openapi.ts    # OpenAPI 3.0.0 specification
+│   └── ui.ts         # Swagger UI HTML renderer
+├── package.json      # Dependencies and npm scripts
+├── tsconfig.json     # TypeScript configuration
+├── .gitignore        # Git ignore rules
+└── README.md         # Project documentation
 ```
 
 The project does not require a frontend because the assignment focuses on building the backend API.
