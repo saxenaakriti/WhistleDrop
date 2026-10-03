@@ -157,7 +157,12 @@ app.put('/reports/:case_code/status', (req: Request, res: Response) => {
   });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`WhistleDrop server running at http://0.0.0.0:${PORT}`);
-  console.log(`Swagger documentation available at http://0.0.0.0:${PORT}/docs`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`WhistleDrop server running at http://0.0.0.0:${PORT}`);
+    console.log(`Swagger documentation available at http://0.0.0.0:${PORT}/docs`);
+  });
+}
+
+export default app;
+export { app };
