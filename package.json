@@ -8,6 +8,9 @@
     "build": "tsc",
     "start": "node dist/src/index.js"
   },
+  "engines": {
+    "node": ">=22.x"
+  },
   "dependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
