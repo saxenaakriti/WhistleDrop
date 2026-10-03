@@ -51,8 +51,8 @@ Follow these step-by-step instructions to run the project locally on your machin
    ```
 
 5. **Explore the API:**
-   - Interactive Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
-   - Alternative ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+   - Interactive Swagger UI: https://whistle-drop-jwy7.vercel.app/docs
+   - Alternative ReDoc: https://whistle-drop-jwy7.vercel.app/redoc
 
 ---
 
@@ -63,7 +63,6 @@ If you do not want to install any external packages, WhistleDrop can run directl
 ```bash
 python3 standalone.py
 ```
-The server will start on [http://localhost:8000](http://localhost:8000).
 
 ---
 
