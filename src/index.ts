@@ -7,8 +7,8 @@ import { openApiSpec } from './openapi.js';
 import { getDocsHtml } from './ui.js';
 
 const app = express();
-const PORT = parseInt(process.env.PORT || '3000', 10);
-const MODERATOR_KEY = process.env.MODERATOR_KEY || 'WD-MOD-2026';
+const PORT = 3000;
+const MODERATOR_KEY = 'WD-MOD-2026';
 
 app.use(cors({
   origin: '*',
