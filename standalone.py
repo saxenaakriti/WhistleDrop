@@ -46,12 +46,22 @@ def init_db():
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     ''')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_case_code ON reports(case_code)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_reports_case_code ON reports(case_code)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_reports_category ON reports(category)')
     cursor.execute('SELECT COUNT(*) as count FROM reports')
     if cursor.fetchone()['count'] == 0:
         cursor.execute('''
         INSERT INTO reports (case_code, category, description, evidence_url, status, status_update, created_at)
         VALUES ('WD-A7K92M4QX81P', 'Security', 'There is a security issue that needs to be reviewed.', 'https://example.com/evidence', 'SUBMITTED', NULL, '2026-10-01T10:15:00.000Z')
+        ''')
+        cursor.execute('''
+        INSERT INTO reports (case_code, category, description, evidence_url, status, status_update, created_at)
+        VALUES ('WD-H93B7X2LQ490', 'Harassment', 'Unwarranted intimidation during department sprint retrospectives.', NULL, 'UNDER_REVIEW', 'Ethics and HR committee opened an inquiry on Oct 2nd.', '2026-10-02T08:30:00.000Z')
+        ''')
+        cursor.execute('''
+        INSERT INTO reports (case_code, category, description, evidence_url, status, status_update, created_at)
+        VALUES ('WD-C41M88Z99K12', 'Corruption', 'Vendor procurement anomalies in Q3 server hardware purchasing.', 'https://example.org/vendor-audit-notes.pdf', 'RESOLVED', 'Independent audit conducted. Vendor contract terminated and controls updated.', '2026-09-28T14:20:00.000Z')
         ''')
     conn.commit()
     conn.close()
@@ -62,7 +72,7 @@ def generate_case_code():
 
 class WhistleDropHandler(http.server.BaseHTTPRequestHandler):
     def send_json(self, status_code, data):
-        body = json.dumps(data).encode("utf-8")
+        body = json.dumps(data, indent=2).encode("utf-8")
         self.send_response(status_code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -86,7 +96,17 @@ class WhistleDropHandler(http.server.BaseHTTPRequestHandler):
 
         # 1. Home
         if path == "/":
-            return self.send_json(200, {"message": "Welcome to WhistleDrop - Speak Without Being Seen (Python SQLite)"})
+            return self.send_json(200, {
+                "message": "Welcome to WhistleDrop - Speak Without Being Seen",
+                "backend": "Python 3 + SQLite",
+                "docs": "/docs",
+                "endpoints": [
+                    "POST /reports - Submit an anonymous incident report",
+                    "GET /reports - Moderator dashboard (requires X-Moderator-Key)",
+                    "GET /reports/{case_code} - Track report status by case code",
+                    "PUT /reports/{case_code}/status - Update report status (requires X-Moderator-Key)"
+                ]
+            })
 
         # 2. Get All Reports
         if path == "/reports":

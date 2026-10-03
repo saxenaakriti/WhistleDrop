@@ -1,8 +1,0 @@
-{
-  "name": "WhistleDrop",
-  "description": "Speak Without Being Seen - Confidential and anonymous reporting backend system with case tracking and moderator management.",
-  "permissions": [],
-  "capabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
-}

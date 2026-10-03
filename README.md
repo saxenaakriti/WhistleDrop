@@ -1,21 +1,6 @@
-# WhistleDrop — Speak Without Being Seen
+# WhistleDrop — Speak Without Being Seen 🛡️
 
-WhistleDrop is a backend system for confidential reporting. It allows people to report problems inside an organization without creating an account or sharing their identity.
-
-The system gives each report a unique case code. The reporter can use this case code later to check the status of the report without logging in.
-
-Moderators can securely view reports, filter them, and update their status.
-
-## Project Links
-
-**GitHub Repository:**
-[https://github.com/saxenaakriti/WhistleDrop](https://github.com/saxenaakriti/WhistleDrop)
-
-**Live API:**
-[https://whistle-drop-jwy7-2598up6yd-akriti14.vercel.app](https://whistle-drop-jwy7-2598up6yd-akriti14.vercel.app)
-
-**Swagger API Documentation:**
-[https://whistle-drop-jwy7-2598up6yd-akriti14.vercel.app/docs](https://whistle-drop-jwy7-2598up6yd-akriti14.vercel.app/docs)
+A confidential, anonymous incident reporting backend system allowing individuals to submit reports, track case status securely using difficult-to-guess case codes, and enabling moderators to manage review workflows with **Python & SQLite**.
 
 ---
 
@@ -33,548 +18,233 @@ Moderators can securely view reports, filter them, and update their status.
 
 ---
 
-## Features
+## Tech Stack
 
-* Anonymous report submission
-* No account required for reporters
-* Unique and difficult-to-guess case codes
-* Case status tracking using the case code
-* Moderator authentication using an API key
-* Moderator report listing
-* Filter reports by category
-* Filter reports by status
-* Status updates by moderators
-* Status workflow validation
-* Input validation
-* Error handling for invalid requests
-* SQLite database for storing reports
-* Swagger/OpenAPI documentation
-* Deployed API using Vercel
-
----
-
-## Technologies Used & Implementations
-
-WhistleDrop provides two complete, interoperable backend implementations:
-
-### 1. Python + SQLite Implementation (`/python` directory & root)
 * **Language:** Python 3.8+
-* **Framework:** FastAPI with automatic OpenAPI / Swagger UI (`/docs`) & ReDoc (`/redoc`)
-* **Database:** SQLite 3 (`whistledrop.db`) with indexing and schema migrations
-* **Data Validation:** Pydantic models for request/response serialization
-* **Zero-Dependency Mode:** Standalone standard library runner (`python/standalone.py`)
-* **Testing:** Built-in unittest suite (`python/test_api.py`)
-
-### 2. Node.js + Express Implementation (Cloud & Serverless)
-* **Runtime:** Node.js & TypeScript
-* **Framework:** Express.js with interactive Swagger UI
-* **Deployment:** Deployed live on Vercel Serverless and AI Studio Preview
-* **CORS:** Fully enabled cross-origin resource sharing for web frontends
+* **Framework:** FastAPI
+* **Database:** SQLite 3 (`whistledrop.db`)
+* **Validation:** Pydantic
+* **Documentation:** Swagger UI / OpenAPI 3.0 (`/docs`) & ReDoc (`/redoc`)
+* **Testing:** Python `unittest`
 
 ---
 
-## Report Categories
+## Key Features
 
-A report can belong to one of the following categories:
-
-* Security
-* Harassment
-* Corruption
-* Technical
-* Other
+* **Anonymous Submission**: No user account, email, or identity required.
+* **Cryptographic Case Codes**: High-entropy unique identifiers (e.g. `WD-A7K92M4QX81P`) generated using `secrets`.
+* **Category & Description Enforcement**: Strict validation for incident category and description.
+* **SQLite Relational Persistence**: Auto-initialized table with optimized indexes on `case_code`, `status`, and `category`.
+* **Public Tracking**: Anyone with a valid case code can query status updates without authentication.
+* **Protected Moderator Access**: Role authorization enforced via secret `X-Moderator-Key: WD-MOD-2026`.
+* **Workflow State Machine**: Enforces valid status transitions:
+  `SUBMITTED` ➔ `UNDER_REVIEW` ➔ `RESOLVED` or `DISMISSED`
+* **Zero-Dependency Mode**: Includes `standalone.py` to run directly on standard Python library.
 
 ---
 
-## Report Status Workflow
+## Project Structure
 
-Reports follow this workflow:
-
-```text
-SUBMITTED
-     ↓
-UNDER_REVIEW
-     ↓
-RESOLVED
-     OR
-DISMISSED
 ```
-
-A report cannot move backwards or skip an invalid status transition.
-
-For example:
-
-* `SUBMITTED → UNDER_REVIEW` ✅
-* `UNDER_REVIEW → RESOLVED` ✅
-* `UNDER_REVIEW → DISMISSED` ✅
-* `SUBMITTED → RESOLVED` ❌
-* `RESOLVED → UNDER_REVIEW` ❌
-
----
-
-## How WhistleDrop Works
-
-### 1. Submit a Report
-
-A reporter sends:
-
-* Category
-* Description
-* Optional evidence/reference URL
-
-No account or personal information is required.
-
-The system creates a unique case code such as:
-
-```text
-WD-A7K92M4QX81P
-```
-
-The reporter should save this case code because it is used to track the report later.
-
-### 2. Track a Report
-
-The reporter can use the case code to check:
-
-* Category
-* Description
-* Current status
-* Latest status update
-* Other relevant report information
-
-No login is required.
-
-### 3. Moderator Access
-
-Moderators use a moderator API key to access the report management endpoints.
-
-They can:
-
-* View reports
-* Filter reports
-* Change report status
-* Add a short status update
-
-The reporter's identity is not stored as part of the report.
-
----
-
-# API Endpoints
-
-## 1. Home
-
-**GET /**
-
-Used to check whether the API is running.
-
-Example response:
-
-```json
-{
-  "message": "Welcome to WhistleDrop - Speak Without Being Seen"
-}
+├── database.py       # SQLite connection, schema creation, indexed queries
+├── main.py           # FastAPI application & API route handlers
+├── schemas.py        # Pydantic request/response validation models
+├── standalone.py     # Standalone Python runner (zero pip dependencies)
+├── test_api.py       # Automated unit test suite
+├── requirements.txt  # Python package dependencies
+├── whistledrop.db    # SQLite database file (pre-seeded)
+├── screenshots/      # Application screenshots (247-253)
+└── README.md         # Documentation
 ```
 
 ---
 
-## 2. Submit a Report
+## Quick Start
 
-**POST /reports**
+### Option 1: FastAPI + SQLite (Recommended)
 
-Creates a new anonymous report.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/saxenaakriti/WhistleDrop.git
+   cd WhistleDrop
+   ```
 
-### Example Request
+2. **Create virtual environment & install dependencies:**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-```json
-{
-  "category": "Security",
-  "description": "There is a security issue that needs to be reviewed.",
-  "evidence_url": "https://example.com/evidence"
-}
-```
+3. **Start the API server:**
+   ```bash
+   uvicorn main:app --reload --port 8000
+   ```
 
-### Example Response
-
-```json
-{
-  "message": "Report received successfully",
-  "case_code": "WD-A7K92M4QX81P",
-  "category": "Security",
-  "description": "There is a security issue that needs to be reviewed.",
-  "evidence_url": "https://example.com/evidence"
-}
-```
-
-The case code is generated automatically by the server.
+4. **Access the Interactive Docs:**
+   * Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
+   * ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 ---
 
-## 3. Track a Report
+### Option 2: Standalone Mode (Zero Dependencies)
 
-**GET /reports/{case_code}**
-
-Used by reporters to check their report.
-
-Example:
-
-```text
-GET /reports/WD-A7K92M4QX81P
-```
-
-No moderator key is required.
-
-If the case code does not exist, the API returns:
-
-```text
-404 Report not found
-```
-
----
-
-## 4. View Reports
-
-**GET /reports**
-
-This endpoint is for moderators.
-
-A moderator key must be provided in the request header.
-
-Header:
-
-```text
-X-Moderator-Key: WD-MOD-2026
-```
-
-Example:
-
-```text
-GET /reports
-```
-
----
-
-## 5. Filter Reports
-
-Moderators can filter reports using category or status.
-
-### Filter by category
-
-```text
-GET /reports?category=Security
-```
-
-### Filter by status
-
-```text
-GET /reports?status=SUBMITTED
-```
-
-### Filter by both
-
-```text
-GET /reports?category=Security&status=SUBMITTED
-```
-
-The moderator key is required.
-
----
-
-## 6. Update Report Status
-
-**PUT /reports/{case_code}/status**
-
-Used by moderators to update the status of a report.
-
-Example:
-
-```text
-PUT /reports/WD-A7K92M4QX81P/status
-```
-
-Header:
-
-```text
-X-Moderator-Key: WD-MOD-2026
-```
-
-Request body:
-
-```json
-{
-  "status": "UNDER_REVIEW",
-  "status_update": "The report is currently being reviewed."
-}
-```
-
-Example response:
-
-```json
-{
-  "message": "Report status updated successfully",
-  "case_code": "WD-A7K92M4QX81P",
-  "status": "UNDER_REVIEW",
-  "status_update": "The report is currently being reviewed."
-}
-```
-
----
-
-# Moderator Authentication
-
-Moderator endpoints are protected using a moderator API key.
-
-The current development key is:
-
-```text
-WD-MOD-2026
-```
-
-The key is sent using the following header:
-
-```text
-X-Moderator-Key
-```
-
-Requests without the correct key receive:
-
-```text
-401 Unauthorized
-```
-
-In a production system, the moderator authentication should be replaced with a stronger authentication system and the secret should be stored securely as an environment variable.
-
----
-
-# Privacy
-
-Privacy is an important part of WhistleDrop.
-
-The system does not require reporters to create an account or provide their name, email address, or other identity information.
-
-Reports are identified using a generated case code instead.
-
-The reporter uses the case code to track the report, while moderators only see the report information needed to review and manage it.
-
-The current implementation does not intentionally store reporter identity information.
-
----
-
-# Case Code Security
-
-Each report receives a randomly generated case code.
-
-The code uses Python's `secrets` module instead of a simple sequential number.
-
-This makes case codes much harder to guess compared with codes such as:
-
-```text
-CASE-001
-CASE-002
-CASE-003
-```
-
-The generated format is:
-
-```text
-WD-XXXXXXXXXXXX
-```
-
-where the characters are randomly selected uppercase letters and numbers.
-
----
-
-# Validation and Error Handling
-
-The API validates incoming requests and returns appropriate error responses.
-
-Examples include:
-
-### Invalid category
-
-```text
-400 Invalid category
-```
-
-### Invalid status
-
-```text
-400 Invalid status
-```
-
-### Invalid status transition
-
-For example, trying to change:
-
-```text
-UNDER_REVIEW → UNDER_REVIEW
-```
-
-returns an error because it is not a valid transition.
-
-### Invalid case code
-
-```text
-404 Report not found
-```
-
-### Incorrect moderator key
-
-```text
-401 Unauthorized moderator access
-```
-
----
-
-# Database
-
-WhistleDrop uses SQLite with SQLAlchemy.
-
-The database stores information such as:
-
-* Case code
-* Category
-* Description
-* Evidence URL
-* Status
-* Status update
-* Creation time
-
-The SQLite database file is excluded from Git using `.gitignore`.
-
----
-
-# Running the Project Locally
-
-No environment variables or `.env` file are required. The server runs directly out of the box.
-
-## 1. Install dependencies
+If you don't have `pip` installed, run directly with standard Python 3:
 
 ```bash
-npm install
+python3 standalone.py
 ```
+* Server starts on [http://localhost:8000](http://localhost:8000).
 
-## 2. Start the development server
+---
+
+## Running Unit Tests
+
+Run the built-in SQLite test suite:
 
 ```bash
-npm run dev
+python3 test_api.py
 ```
 
-The API will be available at:
-
-```text
-http://localhost:3000
+Expected output:
 ```
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.005s
 
-Interactive Swagger documentation is available at:
-
-```text
-http://localhost:3000/docs
+OK
 ```
 
 ---
 
-# Swagger Documentation
+## Database Schema (`whistledrop.db`)
 
-Interactive Swagger API documentation is provided directly at `/docs` using OpenAPI 3.0.0.
+```sql
+CREATE TABLE IF NOT EXISTS reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_code TEXT UNIQUE NOT NULL,
+    category TEXT NOT NULL,
+    description TEXT NOT NULL,
+    evidence_url TEXT,
+    status TEXT NOT NULL DEFAULT 'SUBMITTED',
+    status_update TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-After starting the server, open:
-
-```text
-http://localhost:3000/docs
+CREATE INDEX IF NOT EXISTS idx_reports_case_code ON reports(case_code);
+CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
+CREATE INDEX IF NOT EXISTS idx_reports_category ON reports(category);
 ```
 
-The Swagger page can be used to test all the API endpoints directly without needing a separate client.
+---
+
+## API Reference
+
+### 1. Root / Welcome
+* **Endpoint:** `GET /`
+* **Response:**
+  ```json
+  {
+    "message": "Welcome to WhistleDrop - Speak Without Being Seen"
+  }
+  ```
 
 ---
 
-# Project Structure
+### 2. Submit Anonymous Report
+* **Endpoint:** `POST /reports`
+* **Request Body:**
+  ```json
+  {
+    "category": "Security",
+    "description": "Unauthorized access attempt observed in staging environment.",
+    "evidence_url": "https://example.com/log.txt"
+  }
+  ```
+* **Response (201 Created):**
+  ```json
+  {
+    "message": "Report received successfully",
+    "case_code": "WD-ZEYIW5GKQD3P",
+    "category": "Security",
+    "description": "Unauthorized access attempt observed in staging environment.",
+    "evidence_url": "https://example.com/log.txt"
+  }
+  ```
 
-```text
-WhistleDrop/
-├── src/
-│   ├── index.ts      # Express application and route handlers
-│   ├── types.ts      # Data types, categories, and workflow transitions
-│   ├── db.ts         # In-memory storage and seed data
-│   ├── openapi.ts    # OpenAPI 3.0.0 specification
-│   └── ui.ts         # Swagger UI HTML renderer
-├── package.json      # Dependencies and npm scripts
-├── tsconfig.json     # TypeScript configuration
-├── .gitignore        # Git ignore rules
-└── README.md         # Project documentation
+---
+
+### 3. Track Report Status (Public)
+* **Endpoint:** `GET /reports/{case_code}`
+* **Response (200 OK):**
+  ```json
+  {
+    "id": 1,
+    "case_code": "WD-A7K92M4QX81P",
+    "category": "Security",
+    "description": "There is a security issue that needs to be reviewed.",
+    "evidence_url": "https://example.com/evidence",
+    "status": "SUBMITTED",
+    "status_update": null,
+    "created_at": "2026-10-01T10:15:00.000Z"
+  }
+  ```
+
+---
+
+### 4. Moderator: List & Filter Reports
+* **Endpoint:** `GET /reports?category=Security&status=SUBMITTED`
+* **Headers:** `X-Moderator-Key: WD-MOD-2026`
+* **Response (200 OK):**
+  ```json
+  [
+    {
+      "id": 1,
+      "case_code": "WD-A7K92M4QX81P",
+      "category": "Security",
+      "description": "There is a security issue that needs to be reviewed.",
+      "evidence_url": "https://example.com/evidence",
+      "status": "SUBMITTED",
+      "status_update": null,
+      "created_at": "2026-10-01T10:15:00.000Z"
+    }
+  ]
+  ```
+
+---
+
+### 5. Moderator: Update Report Status
+* **Endpoint:** `PUT /reports/{case_code}/status`
+* **Headers:** `X-Moderator-Key: WD-MOD-2026`
+* **Request Body:**
+  ```json
+  {
+    "status": "UNDER_REVIEW",
+    "status_update": "Ethics committee inquiry opened."
+  }
+  ```
+* **Response (200 OK):**
+  ```json
+  {
+    "message": "Report status updated successfully",
+    "case_code": "WD-A7K92M4QX81P",
+    "status": "UNDER_REVIEW",
+    "status_update": "Ethics committee inquiry opened."
+  }
+  ```
+
+---
+
+## Status Transition Rules
+
+```
+[ SUBMITTED ]
+      │
+      ▼
+[ UNDER_REVIEW ]
+   │         │
+   ▼         ▼
+[RESOLVED] [DISMISSED]
 ```
 
-The project does not require a frontend because the assignment focuses on building the backend API.
-
----
-
-# HTTP Methods Used
-
-| Method | Endpoint                      | Purpose              |
-| ------ | ----------------------------- | -------------------- |
-| GET    | `/`                           | Check API            |
-| POST   | `/reports`                    | Create report        |
-| GET    | `/reports/{case_code}`        | Track report         |
-| GET    | `/reports`                    | View/filter reports  |
-| PUT    | `/reports/{case_code}/status` | Update report status |
-
----
-
-# Design Decisions
-
-### No user accounts
-
-The assignment requires anonymous reporting, so reporters do not create accounts.
-
-### Case code instead of login
-
-A generated case code allows a reporter to track a report without revealing their identity.
-
-### Moderator API key
-
-Moderator functionality is protected so that anyone cannot view or modify reports.
-
-### Status workflow
-
-A fixed status workflow prevents invalid changes to report status.
-
-### SQLite
-
-SQLite was used because it is simple and suitable for this project.
-
-### Swagger
-
-FastAPI's built-in Swagger documentation makes the API easy to demonstrate and test.
-
----
-
-# Future Improvements
-
-Some features that could be added in a larger production version include:
-
-* Stronger moderator authentication
-* Environment variables for secrets
-* Moderator/admin dashboard
-* File upload for evidence
-* Permanent case closure
-* Automated tests
-* Additional privacy protections
-* More advanced report filtering
-* Production database such as PostgreSQL
-* Audit logging for moderator actions
-
----
-
-# Project Purpose
-
-WhistleDrop was created as a backend project to demonstrate how an anonymous reporting system can be designed using FastAPI.
-
-The main focus of the project is:
-
-* Anonymous reporting
-* Secure case tracking
-* Moderator access
-* Status management
-* Input validation
-* Privacy
-* API documentation
-
-The backend can be tested using Swagger/OpenAPI, Postman, cURL, or other API testing tools.
+Any attempt to jump illegally (e.g. `SUBMITTED` ➔ `RESOLVED` directly) returns HTTP `400 Bad Request`.

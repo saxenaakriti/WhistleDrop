@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 WhistleDrop — Python + SQLite Automated Test Suite
-Tests SQLite database creation, seeding, insertions, queries, and constraints.
+Tests SQLite database creation, seeding, insertions, queries, filters, and status workflow.
 """
 
 import os
