@@ -53,12 +53,23 @@ Moderators can securely view reports, filter them, and update their status.
 
 ---
 
-## Technologies Used
+## Technologies Used & Implementations
 
-* Node.js & TypeScript
-* Express.js
-* Swagger UI / OpenAPI 3.0
-* CORS
+WhistleDrop provides two complete, interoperable backend implementations:
+
+### 1. Python + SQLite Implementation (`/python` directory & root)
+* **Language:** Python 3.8+
+* **Framework:** FastAPI with automatic OpenAPI / Swagger UI (`/docs`) & ReDoc (`/redoc`)
+* **Database:** SQLite 3 (`whistledrop.db`) with indexing and schema migrations
+* **Data Validation:** Pydantic models for request/response serialization
+* **Zero-Dependency Mode:** Standalone standard library runner (`python/standalone.py`)
+* **Testing:** Built-in unittest suite (`python/test_api.py`)
+
+### 2. Node.js + Express Implementation (Cloud & Serverless)
+* **Runtime:** Node.js & TypeScript
+* **Framework:** Express.js with interactive Swagger UI
+* **Deployment:** Deployed live on Vercel Serverless and AI Studio Preview
+* **CORS:** Fully enabled cross-origin resource sharing for web frontends
 
 ---
 
